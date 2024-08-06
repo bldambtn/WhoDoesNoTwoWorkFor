@@ -1,3 +1,4 @@
+// Importing the database connection pool module from the 'connection' file
 const pool = require("./connection");
 
 // View all departments
@@ -19,7 +20,11 @@ const viewRoles = async () => {
 // View all employees
 const viewEmployees = async () => {
   const result = await pool.query(`
-    SELECT employee.id, employee.first_name, employee.last_name, role.title AS role, department.name AS department, role.salary, manager.first_name AS manager
+    SELECT employee.id, employee.first_name, employee.last_name, role.title AS role, department.name AS department, role.salary, 
+    CASE
+      WHEN manager.first_name IS NULL THEN 'No Manager Assigned'
+      ELSE CONCAT(manager.first_name, ' ', manager.last_name)
+    END AS manager
     FROM employee
     JOIN role ON employee.role_id = role.id
     JOIN department ON role.department_id = department.id
@@ -57,6 +62,7 @@ const updateEmployeeRole = async (employeeId, newRoleId) => {
   ]);
 };
 
+// Exporting functions related to viewing, adding, and updating departments, roles, and employees
 module.exports = {
   viewDepartments,
   viewRoles,
